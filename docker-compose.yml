@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  api_service:
+    env_file: .env
+    image: marketsales_img:0.0.0
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        - APP_PATH=${BASE_PATH}
+    container_name: marketsales_container
+    hostname: marketsales_route
+    restart: always
+    command: ["conda", "run", "--no-capture-output", "-n", "flask_sales", "flask", "run", "--host", "${HOST_SERVER}", "--port", "5000"]
+    ports:
+      - "${PORT}:5000"
+    volumes:
+      - .:${BASE_PATH}
+      
+networks:
+    default:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: "172.28.0.0/16"
+                  gateway: "172.28.0.254"
+        driver_opts:
+            com.docker.network.bridge.name: br-marketsales
